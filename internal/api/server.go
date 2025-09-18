@@ -3,8 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -38,6 +36,11 @@ func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.L
 	e.POST("/message", handlers.SetMessage)
 	e.GET("/ui", handlers.UI)
 	e.GET("/logs", handlers.Logs)
+	
+	// API Documentation
+	e.GET("/swagger/openapi.yaml", handlers.SwaggerSpec)
+	e.GET("/swagger/*", handlers.SwaggerUI)
+	e.GET("/docs", handlers.RedocDocs)
 
 	return &Server{
 		echo:   e,

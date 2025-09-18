@@ -50,6 +50,15 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 - All log messages and comments in **English**.
 
 ### API Endpoints (Echo)
+
+### API Documentation (Swagger + Redoc)
+- Provide **Swagger UI** at `/swagger/*` serving the OpenAPI spec (`api/openapi.yaml`).
+- Provide **Redoc** documentation at `/docs` as a static HTML page, styled cleanly, also served from the same OpenAPI spec.
+- Ensure both Swagger UI and Redoc remain in sync with the OpenAPI definition.
+
+- Provide a **Swagger UI** served at `/swagger/*` path, exposing and serving the generated OpenAPI spec (`api/openapi.yaml`).
+- Ensure the UI is accessible when the API server is started, styled cleanly, and kept in sync with the spec.
+
 - `GET /health` → JSON with health info (status, uptime, version, commit, build time).
 - `GET /hello?name=...` → JSON with greeting.
 - `GET /message` → JSON `{ "message": "..." }`.
@@ -84,6 +93,7 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 - Include structured fields (request id, path, method, status, latency).
 
 ### OpenAPI Spec
+- The OpenAPI spec should be served via Swagger UI at `/swagger/*`.
 - Author a **single source of truth** OpenAPI 3.1 YAML in `api/openapi.yaml` documenting:
   - `/health` (GET)
   - `/hello` (GET with `name` query)
@@ -122,7 +132,17 @@ Propose and implement a clean structure, for example:
 ```
 
 ### Build, Run, and CI/CD
+- **Makefile** should also include `make docs` target that:
+  - Validates the OpenAPI spec (`api/openapi.yaml`).
+  - Serves or regenerates Swagger UI and Redoc assets so developers can preview API docs locally.
+
 - **Makefile** targets:
+  - `make deps`, `make build`, `make run`, `make lint`, `make test`, `make cover`, `make tailwind`, `make api`, `make cli`, `make docs`
+    - `make docs` should: 
+      - validate and bundle `api/openapi.yaml` (e.g., via `redocly lint/bundle` or `swagger-cli validate`),
+      - (re)generate any embedded Swagger UI assets if needed,
+      - build/update the **Redoc** static HTML page served at `/docs`,
+      - ensure the running server serves **Swagger UI** at `/swagger/*` and Redoc at `/docs` from the latest spec.
   - `make deps`, `make build`, `make run`, `make lint`, `make test`, `make cover`, `make tailwind`, `make api`, `make cli`
 - **Versioning**: Inject `version`, `commit`, `buildTime` via `-ldflags`.
 - **Dockerfile**: Multi-stage, minimal final image (non-root user). Expose the API port.
@@ -142,7 +162,17 @@ Propose and implement a clean structure, for example:
   - Handlers for `/message` and `/hello`.
 - Simple e2e test (spin up server on ephemeral port, hit endpoints).
 
+
+### Build Verification and Testing
+- Ensure that the application can be built and executed successfully on a clean environment with Go 1.25.1.
+- Provide `make build` and `make run` targets that work out-of-the-box.
+- Include **unit tests** (table-driven where appropriate) for all core logic (config load, storage, handlers).
+- Add a `make test` target that runs all tests and generates a coverage report (`make cover` optional).
+- CI pipeline must run linting, testing, and building to verify correctness before merge.
+
 ### Developer Experience
+- **API docs tooling**: include dev dependencies or instructions for `redocly` (or `swagger-cli`) in the README and Makefile so `make docs` works out-of-the-box.
+
 - **README.md** with:
   - Quick start.
   - CLI usage examples.
@@ -159,6 +189,34 @@ Propose and implement a clean structure, for example:
 - Basic health details (goroutines, heap allocs) gated behind a `--debug` flag.
 
 ---
+
+
+## Validation & Self-Testing
+
+Before final delivery, **verify end-to-end** that the application builds, runs, and passes tests locally and in CI.
+
+### Local Smoke Tests
+- Run: `make deps && make lint && make test && make build` — all should succeed.
+- CLI checks:
+  - `myapp version` prints version/commit/build time.
+  - `myapp hello --name Test` prints a greeting.
+  - `myapp set message "Hello from tests"` persists to `message.json`.
+- API checks (start server): `myapp api --host 127.0.0.1 --port 8081`
+  - `curl http://127.0.0.1:8081/health` returns JSON with status OK.
+  - `curl "http://127.0.0.1:8081/hello?name=Test"` returns a greeting JSON.
+  - `curl http://127.0.0.1:8081/message` returns the stored message.
+  - `curl -X POST -H "Content-Type: application/json" -d '{"message":"Updated"}' http://127.0.0.1:8081/message` updates and returns the message.
+  - Visit `/ui`, `/logs`, `/swagger/`, and `/docs` in a browser to confirm they render correctly.
+
+### Unit Tests
+- Provide **table-driven unit tests** for configuration loading/precedence, storage read/write, and `/message` + `/hello` handlers.
+- Add coverage reporting (`make cover`) with a **minimum coverage threshold** (e.g., 70%). Fail CI if below threshold.
+- Where feasible, include a simple e2e test that spins up the API on an ephemeral port and exercises core endpoints.
+
+### CI Verification
+- GitHub Actions workflow must run: setup Go 1.25.1 → lint → test (with coverage) → build → (optionally) `make docs`.
+- CI should **fail** on lint errors, test failures, or coverage below threshold.
+
 
 ## Acceptance Criteria
 
@@ -178,6 +236,12 @@ Propose and implement a clean structure, for example:
 - Project is initialized as a **git** repo with a first commit and `.gitignore`.
 
 ---
+
+- CI workflow runs lint, tests (with coverage), and build successfully on a clean checkout.
+
+- Local smoke tests (CLI commands and API endpoints) behave as documented without manual tweaks.
+
+- Test coverage meets the configured threshold (≥ 70% by default).
 
 ## Deliverables
 

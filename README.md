@@ -95,6 +95,18 @@ The API server provides the following endpoints:
 - `POST /message` - Update stored message (JSON body: `{"message": "text"}`)
 - `GET /ui` - Web interface for message management
 - `GET /logs` - View recent application logs
+- `GET /swagger/` - Swagger UI for API documentation
+- `GET /docs` - Redoc API documentation
+- `GET /swagger/openapi.yaml` - OpenAPI specification
+
+### API Documentation
+
+Interactive API documentation is available when the server is running:
+
+- **Swagger UI**: http://localhost:8080/swagger/
+- **Redoc**: http://localhost:8080/docs
+
+Both interfaces are automatically generated from the OpenAPI 3.1 specification located at `api/openapi.yaml`.
 
 ### Example API Usage
 
@@ -165,7 +177,10 @@ make build         # Build the application
 make run           # Build and run
 make lint          # Run linters
 make test          # Run tests
-make cover         # Generate coverage report
+make cover         # Generate coverage report (70% threshold)
+make docs          # Validate API documentation
+make smoke-test    # Run local smoke tests
+make e2e-test      # Run end-to-end tests
 make clean         # Clean build artifacts
 ```
 
