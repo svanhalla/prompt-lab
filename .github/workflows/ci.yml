@@ -58,6 +58,9 @@ jobs:
     - name: Run smoke tests
       run: make smoke-test
     
+    - name: Run runtime verification
+      run: make runtime-verify
+    
     - name: Run e2e tests
       run: make e2e-test
 

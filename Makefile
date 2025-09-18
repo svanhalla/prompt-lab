@@ -1,4 +1,4 @@
-.PHONY: deps build run lint test cover clean api cli docs help
+.PHONY: deps build run lint test cover clean api cli docs help smoke-test runtime-verify e2e-test
 
 # Build variables
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -100,6 +100,13 @@ smoke-test: build ## Run local smoke tests
 	./$(BINARY_NAME) hello --name "SmokeTest"
 	./$(BINARY_NAME) set message "Hello from smoke tests"
 	@echo "CLI smoke tests passed!"
+
+runtime-verify: build ## Run runtime verification tests
+	@echo "Running runtime verification..."
+	$(GOTEST) -v -run TestRuntimeVerification ./internal/api
+	$(GOTEST) -v -run TestServerStartupValidation ./internal/api
+	$(GOTEST) -v -run TestCoreEndpointsSmoke ./internal/api
+	@echo "Runtime verification passed!"
 
 e2e-test: build ## Run end-to-end tests
 	@echo "Running e2e tests..."

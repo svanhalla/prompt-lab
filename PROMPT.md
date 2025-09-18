@@ -209,6 +209,19 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - Visit `/ui`, `/logs`, `/swagger/`, and `/docs` in a browser to confirm they render correctly.
 
 ### Unit Tests
+### Runtime Verification
+- During development and CI, verify that the **API and Web server start successfully** without errors.
+- Confirm that all documented endpoints return the **expected responses**:
+  - `/health` → status JSON with `ok` and version info.
+  - `/hello?name=Test` → greeting JSON with `Hello, Test!`.
+  - `/message` → returns latest stored message.
+  - `POST /message` → updates and returns message JSON.
+  - `/ui` → HTML page renders current message and update form with Tailwind styling.
+  - `/logs` → HTML page renders recent logs in a human-friendly format.
+  - `/swagger/` → Swagger UI loads and shows API documentation.
+  - `/docs` → Redoc page renders cleanly and matches the OpenAPI spec.
+- Add an automated smoke/e2e test to validate at least `/health`, `/hello`, and `/message` endpoints at runtime.
+
 - Provide **table-driven unit tests** for configuration loading/precedence, storage read/write, and `/message` + `/hello` handlers.
 - Add coverage reporting (`make cover`) with a **minimum coverage threshold** (e.g., 70%). Fail CI if below threshold.
 - Where feasible, include a simple e2e test that spins up the API on an ephemeral port and exercises core endpoints.
@@ -242,6 +255,8 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - Local smoke tests (CLI commands and API endpoints) behave as documented without manual tweaks.
 
 - Test coverage meets the configured threshold (≥ 70% by default).
+
+- API and Web server verified to start and return expected responses during local smoke tests and CI.
 
 ## Deliverables
 

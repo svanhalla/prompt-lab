@@ -180,6 +180,7 @@ make test          # Run tests
 make cover         # Generate coverage report (70% threshold)
 make docs          # Validate API documentation
 make smoke-test    # Run local smoke tests
+make runtime-verify # Run runtime verification tests
 make e2e-test      # Run end-to-end tests
 make clean         # Clean build artifacts
 ```
@@ -211,7 +212,32 @@ go test ./...
 # Run tests with coverage
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
+
+# Run runtime verification
+make runtime-verify
+
+# Run smoke tests
+make smoke-test
+
+# Run end-to-end tests
+make e2e-test
 ```
+
+#### Runtime Verification
+
+The application includes comprehensive runtime verification that validates:
+
+- **Server Startup**: Ensures the API and Web server start successfully without errors
+- **Expected Responses**: Confirms all documented endpoints return correct responses:
+  - `/health` → status JSON with `ok` and version info
+  - `/hello?name=Test` → greeting JSON with `Hello, Test!`
+  - `/message` → returns latest stored message
+  - `POST /message` → updates and returns message JSON
+  - `/ui` → HTML page renders current message and update form with Tailwind styling
+  - `/logs` → HTML page renders recent logs in human-friendly format
+  - `/swagger/` → Swagger UI loads and shows API documentation
+  - `/docs` → Redoc page renders cleanly and matches OpenAPI spec
+- **Core Endpoints**: Automated smoke/e2e tests validate critical functionality at runtime
 
 ### Docker
 
