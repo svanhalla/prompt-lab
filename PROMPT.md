@@ -34,6 +34,8 @@ The project must be **well-structured**, **git-versioned**, documented, and read
   - **Template Structure**: Store templates in `internal/web/templates/` directory with proper file organization
   - **Embedded Templates**: Use Go's `embed` directive to embed template files in the binary
   - **Template Manager**: Create `internal/web/templates.go` to load and manage all templates
+  - **Hot Reload Development**: Implement filesystem fallback - if template files exist on disk, use them (allowing live editing); otherwise use embedded templates (production)
+  - **Development Mode**: Auto-detect development mode by checking if template files exist in filesystem
   - **No Inline HTML**: Avoid inline HTML strings in Go code; use proper template files for maintainability
 - **Styling**: **Tailwind CSS** (set up a minimal build pipeline).
 - **Logging**: **logrus** (JSON formatter in production; human-readable in dev).
@@ -183,6 +185,7 @@ Propose and implement a clean structure, for example:
 
 ### Developer Experience
 - **API docs tooling**: include dev dependencies or instructions for `redocly` (or `swagger-cli`) in the README and Makefile so `make docs` works out-of-the-box.
+- **Hot Reload Templates**: In development (when template files exist on filesystem), templates are reloaded on each request for instant feedback. In production (compiled binary), embedded templates are used for performance.
 
 - **README.md** with:
   - Quick start.
@@ -289,6 +292,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - API and Web server verified to start and return expected responses during local smoke tests and CI.
 
 - **First-time success**: A user should be able to run `make build && ./myapp api` and immediately access all endpoints without errors.
+- **Hot Reload Development**: When running from source directory, template changes should be visible immediately without recompilation. When running compiled binary elsewhere, embedded templates should work.
 
 ## Deliverables
 

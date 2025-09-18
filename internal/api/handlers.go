@@ -45,7 +45,16 @@ type MessageRequest struct {
 }
 
 func NewHandlers(store *storage.MessageStore, logger *logrus.Logger, dataPath string) (*Handlers, error) {
-	templates, err := web.NewTemplates()
+	// Detect development mode by checking if template files exist
+	devMode := false
+	if _, err := os.Stat(filepath.Join("internal", "web", "templates", "ui.html")); err == nil {
+		devMode = true
+		logger.Info("Development mode: Using filesystem templates with hot reload")
+	} else {
+		logger.Info("Production mode: Using embedded templates")
+	}
+
+	templates, err := web.NewTemplates(devMode)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load templates: %w", err)
 	}
@@ -117,7 +126,7 @@ func (h *Handlers) UI(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
-	return h.templates.UI.Execute(c.Response().Writer, data)
+	return h.templates.GetUI().Execute(c.Response().Writer, data)
 }
 
 func (h *Handlers) Logs(c echo.Context) error {
@@ -147,12 +156,12 @@ func (h *Handlers) Logs(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
-	return h.templates.Logs.Execute(c.Response().Writer, data)
+	return h.templates.GetLogs().Execute(c.Response().Writer, data)
 }
 
 func (h *Handlers) SwaggerUI(c echo.Context) error {
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
-	return h.templates.Swagger.Execute(c.Response().Writer, nil)
+	return h.templates.GetSwagger().Execute(c.Response().Writer, nil)
 }
 
 func (h *Handlers) SwaggerSpec(c echo.Context) error {
@@ -222,7 +231,7 @@ func (h *Handlers) RedocDocs(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
-	return h.templates.Redoc.Execute(c.Response().Writer, data_struct)
+	return h.templates.GetRedoc().Execute(c.Response().Writer, data_struct)
 }
 
 func (h *Handlers) NotFound(c echo.Context) error {
@@ -238,5 +247,5 @@ func (h *Handlers) NotFound(c echo.Context) error {
 	// For browser requests, return helpful HTML page
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
 	c.Response().WriteHeader(http.StatusNotFound)
-	return h.templates.NotFound.Execute(c.Response().Writer, nil)
+	return h.templates.GetNotFound().Execute(c.Response().Writer, nil)
 }
