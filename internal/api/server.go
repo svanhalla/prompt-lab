@@ -18,7 +18,7 @@ type Server struct {
 	logger *logrus.Logger
 }
 
-func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.Logger) *Server {
+func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.Logger) (*Server, error) {
 	e := echo.New()
 	e.HideBanner = true
 
@@ -28,7 +28,10 @@ func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.L
 	e.Use(RequestLogger(logger))
 
 	// Handlers
-	handlers := NewHandlers(store, logger, cfg.DataPath)
+	handlers, err := NewHandlers(store, logger, cfg.DataPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create handlers: %w", err)
+	}
 
 	// Custom 404 handler
 	e.HTTPErrorHandler = func(err error, c echo.Context) {
@@ -59,7 +62,7 @@ func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.L
 		echo:   e,
 		config: cfg,
 		logger: logger,
-	}
+	}, nil
 }
 
 func (s *Server) Start() error {

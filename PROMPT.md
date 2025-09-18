@@ -31,6 +31,10 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 - **CLI**: **Cobra** for commands, **Viper** for configuration (env vars + flags + config file).
 - **Web server**: **Echo**.
 - **Templates**: Go `html/template` for server-side rendering.
+  - **Template Structure**: Store templates in `internal/web/templates/` directory with proper file organization
+  - **Embedded Templates**: Use Go's `embed` directive to embed template files in the binary
+  - **Template Manager**: Create `internal/web/templates.go` to load and manage all templates
+  - **No Inline HTML**: Avoid inline HTML strings in Go code; use proper template files for maintainability
 - **Styling**: **Tailwind CSS** (set up a minimal build pipeline).
 - **Logging**: **logrus** (JSON formatter in production; human-readable in dev).
 - **Linting**: **golangci-lint** with a sensible, strict config that still allows velocity.
@@ -114,7 +118,8 @@ Propose and implement a clean structure, for example:
     config/                # config types, load/validate defaults
     logging/               # logrus setup
     storage/               # persistence of config + message
-    web/                   # templates, Tailwind assets, helpers
+    web/                   # embedded templates and assets
+      templates/           # HTML template files (*.html)
     version/               # version info (ldflags)
   api/
     openapi.yaml

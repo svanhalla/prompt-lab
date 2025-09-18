@@ -47,7 +47,10 @@ var apiCmd = &cobra.Command{
 		}
 
 		// Create and start server
-		server := api.NewServer(cfg, store, logger)
+		server, err := api.NewServer(cfg, store, logger)
+		if err != nil {
+			logger.WithError(err).Fatal("Failed to create server")
+		}
 
 		// Graceful shutdown
 		go func() {
