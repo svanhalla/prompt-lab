@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -29,7 +30,19 @@ func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.L
 	// Handlers
 	handlers := NewHandlers(store, logger, cfg.DataPath)
 
+	// Custom 404 handler
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		if he, ok := err.(*echo.HTTPError); ok && he.Code == http.StatusNotFound {
+			handlers.NotFound(c)
+			return
+		}
+		e.DefaultHTTPErrorHandler(err, c)
+	}
+
 	// Routes
+	e.GET("/", func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "/ui")
+	})
 	e.GET("/health", handlers.Health)
 	e.GET("/hello", handlers.Hello)
 	e.GET("/message", handlers.GetMessage)

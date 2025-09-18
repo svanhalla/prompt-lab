@@ -71,6 +71,7 @@ The project must be **well-structured**, **git-versioned**, documented, and read
   - Shows current message.
   - Has a form to update message (POSTs to `/message`).
   - Includes Tailwind styling; keep the page clean and modern.
+- **404 Handler** → For browser requests, show a helpful HTML page with links to all valid endpoints instead of JSON error. For API requests (JSON Accept header), return JSON error response.
 
 ### Persistence
 - Default data directory: `~/.<appname>/`
@@ -266,6 +267,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - `GET /logs` shows recent logs with nice formatting.
   - `GET /swagger/` shows Swagger UI with API documentation.
   - `GET /docs` shows Redoc documentation.
+  - **404 responses**: Browser requests to non-existent paths show helpful HTML page with links to valid endpoints.
 - `golangci-lint` passes via `make lint`.
 - Unit tests pass with `make test` and coverage report is generated.
 - OpenAPI 3.1 spec exists at `api/openapi.yaml` and matches implemented endpoints.
