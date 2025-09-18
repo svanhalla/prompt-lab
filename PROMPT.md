@@ -41,7 +41,7 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 - Root command name: suggest a **sane, short, memorable** name (e.g., `greetd`, `gomsg`, `sayso`, or similar). Document your choice.
 - Subcommands:
   - `health`: prints JSON health output (status, uptime, version, git commit, build time).
-  - `hello [--name NAME]`: prints “Hello, NAME!” or “Hello, World!” if omitted.
+  - `hello [--name NAME]`: prints "Hello, NAME!" or "Hello, World!" if omitted.
   - `set message <text>`: persists the message to disk (JSON).
   - `api [--host 0.0.0.0 --port 8080]`: starts the API + Web server.
 - Config precedence: **flags > env vars > config file defaults**.
@@ -55,10 +55,13 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 - Provide **Swagger UI** at `/swagger/*` serving the OpenAPI spec (`api/openapi.yaml`).
 - Provide **Redoc** documentation at `/docs` as a static HTML page, styled cleanly, also served from the same OpenAPI spec.
 - Ensure both Swagger UI and Redoc remain in sync with the OpenAPI definition.
+- **Important**: Swagger/Redoc endpoints must handle missing OpenAPI spec files gracefully (return 404 with clear error message).
+- **Route Ordering**: Define specific routes (like `/swagger/openapi.yaml`) before wildcard routes (`/swagger/*`) to avoid conflicts.
 
 - Provide a **Swagger UI** served at `/swagger/*` path, exposing and serving the generated OpenAPI spec (`api/openapi.yaml`).
 - Ensure the UI is accessible when the API server is started, styled cleanly, and kept in sync with the spec.
 
+- `GET /` → Redirect to `/ui` for better user experience when hitting the root path.
 - `GET /health` → JSON with health info (status, uptime, version, commit, build time).
 - `GET /hello?name=...` → JSON with greeting.
 - `GET /message` → JSON `{ "message": "..." }`.
@@ -150,6 +153,7 @@ Propose and implement a clean structure, for example:
   - `ci.yml` with steps: setup Go 1.25.1, cache, lint, test (with coverage), build.
   - Optional: Tailwind build step that runs on pushes (keep deterministic).
 - **golangci-lint**: enable common linters (staticcheck, revive, gofumpt, govet, errcheck, gocyclo with reasonable thresholds, mnd tuned to allow HTTP codes). Ensure `make lint` passes on the generated code.
+- **Portability**: Ensure Makefile works on systems without external dependencies like `bc` command. Use portable shell commands (awk, sed) for coverage calculations.
 
 ### Security & Quality
 - Input validation (for POST /message).
@@ -169,6 +173,7 @@ Propose and implement a clean structure, for example:
 - Include **unit tests** (table-driven where appropriate) for all core logic (config load, storage, handlers).
 - Add a `make test` target that runs all tests and generates a coverage report (`make cover` optional).
 - CI pipeline must run linting, testing, and building to verify correctness before merge.
+- **Test Environment Setup**: Tests should create necessary files (OpenAPI spec, config files) in temporary directories rather than relying on project files. This ensures tests are isolated and work in any environment.
 
 ### Developer Experience
 - **API docs tooling**: include dev dependencies or instructions for `redocly` (or `swagger-cli`) in the README and Makefile so `make docs` works out-of-the-box.
@@ -179,6 +184,18 @@ Propose and implement a clean structure, for example:
   - Config reference.
   - API docs pointer (OpenAPI).
   - Build/run with and without Docker.
+  - **Clear endpoint documentation** with examples:
+    ```
+    Available endpoints:
+    - http://localhost:8080/          (redirects to /ui)
+    - http://localhost:8080/health    (health check)
+    - http://localhost:8080/hello     (greeting API)
+    - http://localhost:8080/message   (get/set message)
+    - http://localhost:8080/ui        (web interface)
+    - http://localhost:8080/logs      (view logs)
+    - http://localhost:8080/swagger/  (Swagger UI)
+    - http://localhost:8080/docs      (Redoc docs)
+    ```
 - **.env.example** with typical environment variables.
 - **LICENSE** (MIT by default unless you prefer Apache-2.0).
 - Comments and printed output in **English**.
@@ -207,6 +224,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - `curl http://127.0.0.1:8081/message` returns the stored message.
   - `curl -X POST -H "Content-Type: application/json" -d '{"message":"Updated"}' http://127.0.0.1:8081/message` updates and returns the message.
   - Visit `/ui`, `/logs`, `/swagger/`, and `/docs` in a browser to confirm they render correctly.
+  - **Root path test**: `curl http://127.0.0.1:8081/` should redirect to `/ui` (302 status).
 
 ### Unit Tests
 ### Runtime Verification
@@ -220,7 +238,9 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - `/logs` → HTML page renders recent logs in a human-friendly format.
   - `/swagger/` → Swagger UI loads and shows API documentation.
   - `/docs` → Redoc page renders cleanly and matches the OpenAPI spec.
+  - `/` → redirects to `/ui` (302 status).
 - Add an automated smoke/e2e test to validate at least `/health`, `/hello`, and `/message` endpoints at runtime.
+- **Test Isolation**: Runtime verification tests should create mock OpenAPI specs and other dependencies in temporary directories to ensure they work in any environment.
 
 - Provide **table-driven unit tests** for configuration loading/precedence, storage read/write, and `/message` + `/hello` handlers.
 - Add coverage reporting (`make cover`) with a **minimum coverage threshold** (e.g., 70%). Fail CI if below threshold.
@@ -237,12 +257,15 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - `myapp version` prints version, commit, build time.
 - `myapp set message "Hi"` stores to `message.json`.
 - `myapp api --host 0.0.0.0 --port 8080` serves:
+  - `GET /` redirects to `/ui` (302 status).
   - `GET /health` returns status + version info.
   - `GET /hello?name=Hans` returns greeting JSON.
   - `GET /message` returns the stored message.
   - `POST /message` updates the message on disk.
   - `GET /ui` shows the message + update form (Tailwind styled).
   - `GET /logs` shows recent logs with nice formatting.
+  - `GET /swagger/` shows Swagger UI with API documentation.
+  - `GET /docs` shows Redoc documentation.
 - `golangci-lint` passes via `make lint`.
 - Unit tests pass with `make test` and coverage report is generated.
 - OpenAPI 3.1 spec exists at `api/openapi.yaml` and matches implemented endpoints.
@@ -258,10 +281,13 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 
 - API and Web server verified to start and return expected responses during local smoke tests and CI.
 
+- **First-time success**: A user should be able to run `make build && ./myapp api` and immediately access all endpoints without errors.
+
 ## Deliverables
 
 1) Complete repository with source code, tests, OpenAPI spec, Makefile, Dockerfile, Tailwind config, GitHub Actions workflow, `.golangci.yml`, `.env.example`, README, LICENSE.  
 2) Clear instructions in README to install, configure, run CLI and API, and build Tailwind assets.  
 3) Justify the chosen **app name** and any architectural decisions in the README.
+4) **User-friendly experience**: Root path `/` redirects to main UI, clear error messages, and comprehensive endpoint documentation.
 
 > If any requirement is ambiguous or missing, make senior-level decisions and document them.
