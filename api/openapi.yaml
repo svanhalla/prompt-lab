@@ -1,0 +1,232 @@
+openapi: 3.1.0
+info:
+  title: Greetd API
+  description: A friendly greeting and message management API
+  version: 1.0.0
+  contact:
+    name: Greetd API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: Get application health status
+      description: Returns the current health status, version information, and uptime
+      operationId: getHealth
+      responses:
+        '200':
+          description: Health information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "ok"
+                version:
+                  version: "1.0.0"
+                  commit: "abc123"
+                  build_time: "2024-01-01T00:00:00Z"
+                  go_version: "go1.25.1"
+                uptime: 3600000000000
+                timestamp: "2024-01-01T12:00:00Z"
+
+  /hello:
+    get:
+      summary: Get a greeting message
+      description: Returns a personalized greeting message
+      operationId: getHello
+      parameters:
+        - name: name
+          in: query
+          description: Name to include in the greeting
+          required: false
+          schema:
+            type: string
+            example: "World"
+      responses:
+        '200':
+          description: Greeting message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloResponse'
+              example:
+                message: "Hello, World!"
+
+  /message:
+    get:
+      summary: Get the current stored message
+      description: Retrieves the currently stored message
+      operationId: getMessage
+      responses:
+        '200':
+          description: Current message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: "Hello, World!"
+
+    post:
+      summary: Update the stored message
+      description: Updates the message that is persisted to disk
+      operationId: setMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+            example:
+              message: "Hello, Universe!"
+      responses:
+        '200':
+          description: Message updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+              example:
+                message: "Hello, Universe!"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Message cannot be empty"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Failed to save message"
+
+  /ui:
+    get:
+      summary: Web UI for message management
+      description: Returns an HTML page for viewing and updating the message
+      operationId: getUI
+      responses:
+        '200':
+          description: HTML page
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /logs:
+    get:
+      summary: View application logs
+      description: Returns an HTML page displaying recent application logs
+      operationId: getLogs
+      responses:
+        '200':
+          description: HTML page with logs
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+        - uptime
+        - timestamp
+      properties:
+        status:
+          type: string
+          description: Health status
+          example: "ok"
+        version:
+          $ref: '#/components/schemas/VersionInfo'
+        uptime:
+          type: integer
+          format: int64
+          description: Uptime in nanoseconds
+          example: 3600000000000
+        timestamp:
+          type: string
+          format: date-time
+          description: Current timestamp
+          example: "2024-01-01T12:00:00Z"
+
+    VersionInfo:
+      type: object
+      required:
+        - version
+        - commit
+        - build_time
+        - go_version
+      properties:
+        version:
+          type: string
+          description: Application version
+          example: "1.0.0"
+        commit:
+          type: string
+          description: Git commit hash
+          example: "abc123"
+        build_time:
+          type: string
+          description: Build timestamp
+          example: "2024-01-01T00:00:00Z"
+        go_version:
+          type: string
+          description: Go version used to build
+          example: "go1.25.1"
+
+    HelloResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Greeting message
+          example: "Hello, World!"
+
+    MessageRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Message to store
+          minLength: 1
+          example: "Hello, Universe!"
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Stored message
+          example: "Hello, World!"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid input"

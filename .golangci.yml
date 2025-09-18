@@ -1,0 +1,89 @@
+run:
+  timeout: 5m
+  go: "1.25.1"
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+      - name: package-comments
+        disabled: true
+  
+  staticcheck:
+    checks: ["all"]
+  
+  mnd:
+    checks:
+      - argument
+      - case
+      - condition
+      - operation
+      - return
+      - assign
+    ignored-numbers:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '8080'
+      - '80'
+      - '443'
+      - '200'
+      - '400'
+      - '401'
+      - '403'
+      - '404'
+      - '500'
+      - '503'
+      - '100'
+      - '644'
+      - '755'
+      - '10'
+      - '28'
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gocyclo
+    - gofumpt
+    - revive
+    - mnd
+    - gosec
+    - unconvert
+    - misspell
+    - prealloc
+    - exportloopref
+  
+  disable:
+    - exhaustive
+    - exhaustivestruct
+    - gochecknoinits
+    - gochecknoglobals
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - mnd
+    - path: cmd/
+      linters:
+        - mnd
+    - text: "G404: Use of weak random number generator"
+      linters:
+        - gosec

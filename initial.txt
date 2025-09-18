@@ -1,0 +1,15 @@
+Jag vill att du gör en prompt för aws q chat som utvecklar en golang app som är ett cli som innehålller 
+Health
+Hello
+set Message (POST)
+
+jag vill att golang appen utvecklas som om den var skriven av en senior utvecklare med mycket god kunskap om golang. Jag vill att golang 1.25.1 används. För CLI vill jag att Cobra/Viper används loggning är en självklarhet och logrus ska användas för detta
+Dessutom vill jag att det ska vara möjligt att starta applikationen med hjälp av cli exempelvis go-demo api eller liknande kommando som senior utvecklare antar jag att du kommer på ett lämpligare namn
+jag vill också kunna starta en web server (echo) som med hjälp av golang html templeting sätter ihop html sida som kan agera för att visa lagrat message (som lagras på disk i json fil) applikationens intällningar ska också lagras i json fil om den saknas ska den skapas med default värden.
+
+Jag vill ha en sida som kan hämta aplikationens logg och visa den snyggt. som css ramverk vill jag att tailwind används.
+
+Jag vill också att api ska dokumenteras i en open api spec. Allt ska skrivas som ett välstrukturerat mjukvaru projekt som kan lagras på github. Projektet ska versions hanteras av git. 
+
+Om q chat kommer på att jag missat nåt ska den självklart lägga till det likaså om du tycker något mer ska skrivas i prompten till q chat så lägger du till det jag vill att prompten skrivs på engelska i markdown format.
+
