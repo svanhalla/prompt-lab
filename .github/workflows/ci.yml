@@ -106,7 +106,9 @@ jobs:
       uses: docker/setup-buildx-action@v3
     
     - name: Build Docker image
-      run: make docker-build
+      run: |
+        make docker-build
+        docker tag greetd:$(git describe --tags --always --dirty 2>/dev/null || echo "dev") greetd:dev
     
     - name: Test Docker image
       run: |
