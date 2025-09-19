@@ -298,6 +298,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - **Gitignore**: Use `/binary-name` not `binary-name` to avoid ignoring directories with same name
 - **Error Handling**: Functions returning errors must be handled in tests (avoid assignment mismatch)
 - **Formatting**: Always run `make lint` after code changes to catch gofmt issues
+- **Docker CI**: Tag built images for testing (e.g., `docker tag greetd:$(VERSION) greetd:dev`)
 
 ---
 
