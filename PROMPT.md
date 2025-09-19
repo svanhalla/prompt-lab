@@ -44,9 +44,10 @@ The project must be **well-structured**, **git-versioned**, documented, and read
   - **Linters vs Formatters**: Separate `linters:` and `formatters:` sections (v2 breaking change)
   - **Go Version**: Specify Go version in `run.go` field to match go.mod version
   - **Essential Setup**: Enable govet, ineffassign, misspell, unused, staticcheck linters; gofmt, goimports formatters
-- **Tests**: Unit tests with table-driven style; include coverage targets.
+- **Tests**: Unit tests with table-driven style; include coverage targets (60% threshold).
   - **Error Handling**: Functions returning errors must be properly handled in tests (avoid "assignment mismatch" compilation errors)
   - **Test Isolation**: Use temporary directories and ephemeral ports for test isolation
+  - **Coverage Focus**: Business logic coverage; main functions and CLI commands are acceptable to exclude
 - **OpenAPI**: Provide a complete **OpenAPI 3.1** spec for the API.
 
 ### CLI Design
@@ -283,7 +284,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - `GET /docs` shows Redoc documentation.
   - **404 responses**: Browser requests to non-existent paths show helpful HTML page with links to valid endpoints.
 - `golangci-lint v2` passes via `make lint` with proper config format.
-- Unit tests pass with `make test` and coverage report is generated.
+- Unit tests pass with `make test` and coverage report is generated (60% threshold).
 - OpenAPI 3.1 spec exists at `api/openapi.yaml` and matches implemented endpoints.
 - Project is initialized as a **git** repo with a first commit and `.gitignore`.
 
