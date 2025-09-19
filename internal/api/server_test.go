@@ -61,7 +61,8 @@ paths:
 	require.NoError(t, err)
 
 	// Create server
-	server := NewServer(cfg, store, logger)
+	server, err := NewServer(cfg, store, logger)
+	require.NoError(t, err)
 
 	// Start server on ephemeral port
 	testServer := httptest.NewServer(server.echo)
@@ -181,7 +182,8 @@ func TestServerGracefulShutdown(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create server
-	server := NewServer(cfg, store, logger)
+	server, err := NewServer(cfg, store, logger)
+	require.NoError(t, err)
 
 	// Test graceful shutdown
 	done := make(chan error, 1)

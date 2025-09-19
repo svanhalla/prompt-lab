@@ -11,12 +11,12 @@ import (
 var templateFS embed.FS
 
 type Templates struct {
-	UI      *template.Template
-	Logs    *template.Template
+	UI       *template.Template
+	Logs     *template.Template
 	NotFound *template.Template
-	Swagger *template.Template
-	Redoc   *template.Template
-	devMode bool
+	Swagger  *template.Template
+	Redoc    *template.Template
+	devMode  bool
 }
 
 // parseTemplate tries to load from filesystem first, falls back to embedded
@@ -28,7 +28,7 @@ func parseTemplate(name string, devMode bool) (*template.Template, error) {
 			return template.ParseFiles(fsPath)
 		}
 	}
-	
+
 	// Fallback to embedded (for production or when filesystem not available)
 	return template.ParseFS(templateFS, "templates/"+name)
 }
@@ -38,7 +38,7 @@ func (t *Templates) reloadTemplate(name string) *template.Template {
 	if !t.devMode {
 		return nil // Don't reload in production
 	}
-	
+
 	fsPath := filepath.Join("internal", "web", "templates", name)
 	if _, err := os.Stat(fsPath); err == nil {
 		if tmpl, err := template.ParseFiles(fsPath); err == nil {

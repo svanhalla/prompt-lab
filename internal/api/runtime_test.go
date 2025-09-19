@@ -59,7 +59,8 @@ paths:
 	require.NoError(t, err)
 
 	// Create server
-	server := NewServer(cfg, store, logger)
+	server, err := NewServer(cfg, store, logger)
+	require.NoError(t, err)
 
 	// Start test server
 	testServer := httptest.NewServer(server.echo)
@@ -261,7 +262,8 @@ func TestServerStartupValidation(t *testing.T) {
 	require.NoError(t, err)
 
 	// Server creation should not panic or error
-	server := NewServer(cfg, store, logger)
+	server, err := NewServer(cfg, store, logger)
+	require.NoError(t, err)
 	assert.NotNil(t, server)
 	assert.NotNil(t, server.echo)
 
@@ -314,7 +316,8 @@ paths:
 	err = store.Load()
 	require.NoError(t, err)
 
-	server := NewServer(cfg, store, logger)
+	server, err := NewServer(cfg, store, logger)
+	require.NoError(t, err)
 	testServer := httptest.NewServer(server.echo)
 	defer testServer.Close()
 
@@ -352,7 +355,7 @@ paths:
 			require.NoError(t, err, "Failed to make request to %s", endpoint.path)
 			defer resp.Body.Close()
 
-			assert.Equal(t, endpoint.status, resp.StatusCode, 
+			assert.Equal(t, endpoint.status, resp.StatusCode,
 				"Unexpected status for %s %s", endpoint.method, endpoint.path)
 		})
 	}

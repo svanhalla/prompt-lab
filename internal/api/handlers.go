@@ -111,9 +111,7 @@ func (h *Handlers) SetMessage(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save message"})
 	}
 
-	return c.JSON(http.StatusOK, MessageResponse{
-		Message: req.Message,
-	})
+	return c.JSON(http.StatusOK, MessageResponse(req))
 }
 
 func (h *Handlers) UI(c echo.Context) error {
@@ -131,7 +129,7 @@ func (h *Handlers) UI(c echo.Context) error {
 
 func (h *Handlers) Logs(c echo.Context) error {
 	logFile := filepath.Join(h.dataPath, "app.log")
-	
+
 	var logs []string
 	file, err := os.Open(logFile)
 	if err != nil {
@@ -142,7 +140,7 @@ func (h *Handlers) Logs(c echo.Context) error {
 		for scanner.Scan() {
 			logs = append(logs, scanner.Text())
 		}
-		
+
 		// Keep only last 50 lines
 		if len(logs) > 50 {
 			logs = logs[len(logs)-50:]
@@ -170,17 +168,17 @@ func (h *Handlers) SwaggerSpec(c echo.Context) error {
 		filepath.Join(".", "api", "openapi.yaml"),
 		"../../../api/openapi.yaml", // For tests
 	}
-	
+
 	var data []byte
 	var err error
-	
+
 	for _, specPath := range specPaths {
 		data, err = os.ReadFile(specPath)
 		if err == nil {
 			break
 		}
 	}
-	
+
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "OpenAPI spec not found"})
 	}
@@ -194,17 +192,17 @@ func (h *Handlers) RedocDocs(c echo.Context) error {
 		filepath.Join(".", "api", "openapi.yaml"),
 		"../../../api/openapi.yaml", // For tests
 	}
-	
+
 	var data []byte
 	var err error
-	
+
 	for _, specPath := range specPaths {
 		data, err = os.ReadFile(specPath)
 		if err == nil {
 			break
 		}
 	}
-	
+
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "OpenAPI spec not found"})
 	}
@@ -236,10 +234,10 @@ func (h *Handlers) RedocDocs(c echo.Context) error {
 
 func (h *Handlers) NotFound(c echo.Context) error {
 	// For API requests (JSON), return JSON error
-	if c.Request().Header.Get("Accept") == "application/json" || 
-	   c.Request().Header.Get("Content-Type") == "application/json" {
+	if c.Request().Header.Get("Accept") == "application/json" ||
+		c.Request().Header.Get("Content-Type") == "application/json" {
 		return c.JSON(http.StatusNotFound, map[string]string{
-			"error": "Not Found",
+			"error":   "Not Found",
 			"message": "The requested endpoint does not exist",
 		})
 	}

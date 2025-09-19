@@ -52,7 +52,7 @@ func NewServer(cfg *config.Config, store *storage.MessageStore, logger *logrus.L
 	e.POST("/message", handlers.SetMessage)
 	e.GET("/ui", handlers.UI)
 	e.GET("/logs", handlers.Logs)
-	
+
 	// API Documentation
 	e.GET("/swagger/openapi.yaml", handlers.SwaggerSpec)
 	e.GET("/swagger/*", handlers.SwaggerUI)
@@ -78,9 +78,9 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 func RequestLogger(logger *logrus.Logger) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
-		LogMethod: true,
+		LogURI:     true,
+		LogStatus:  true,
+		LogMethod:  true,
 		LogLatency: true,
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			logger.WithFields(logrus.Fields{
