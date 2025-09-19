@@ -4,7 +4,7 @@ You are an expert senior Go (Golang) engineer. Create a **production-quality** p
 
 ## High-Level Goal
 
-Build a **Go 1.25.1** application that is both:
+Build a **Go 1.25** application that is both:
 
 1) A **CLI** (using **Cobra** + **Viper**) with subcommands:
 - `health` — returns application health information.
@@ -27,7 +27,7 @@ The project must be **well-structured**, **git-versioned**, documented, and read
 ## Technical Requirements
 
 ### Languages, Frameworks, and Tooling
-- **Go**: version **1.25.1** (ensure `go.mod` enforces this).
+- **Go**: version **1.25** (ensure `go.mod` enforces this).
 - **CLI**: **Cobra** for commands, **Viper** for configuration (env vars + flags + config file).
 - **Web server**: **Echo**.
 - **Templates**: Go `html/template` for server-side rendering.
@@ -158,7 +158,7 @@ Propose and implement a clean structure, for example:
 - **Versioning**: Inject `version`, `commit`, `buildTime` via `-ldflags`.
 - **Dockerfile**: Multi-stage, minimal final image (non-root user). Expose the API port.
 - **GitHub Actions**:
-  - `ci.yml` with steps: setup Go 1.25.1, cache, lint, test (with coverage), build.
+  - `ci.yml` with steps: setup Go 1.25, cache, lint, test (with coverage), build.
   - Optional: Tailwind build step that runs on pushes (keep deterministic).
 - **golangci-lint**: enable common linters (staticcheck, revive, gofumpt, govet, errcheck, gocyclo with reasonable thresholds, mnd tuned to allow HTTP codes). Ensure `make lint` passes on the generated code.
 - **Portability**: Ensure Makefile works on systems without external dependencies like `bc` command. Use portable shell commands (awk, sed) for coverage calculations.
@@ -256,7 +256,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - Where feasible, include a simple e2e test that spins up the API on an ephemeral port and exercises core endpoints.
 
 ### CI Verification
-- GitHub Actions workflow must run: setup Go 1.25.1 → lint → test (with coverage) → build → (optionally) `make docs`.
+- GitHub Actions workflow must run: setup Go 1.25 → lint → test (with coverage) → build → (optionally) `make docs`.
 - CI should **fail** on lint errors, test failures, or coverage below threshold.
 
 

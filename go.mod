@@ -1,6 +1,6 @@
 module github.com/svanhalla/prompt-lab/greetd
 
-go 1.25.1
+go 1.25
 
 require (
 	github.com/labstack/echo/v4 v4.12.0
