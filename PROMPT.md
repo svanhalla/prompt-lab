@@ -287,6 +287,17 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
 - Unit tests pass with `make test` and coverage report is generated (60% threshold).
 - OpenAPI 3.1 spec exists at `api/openapi.yaml` and matches implemented endpoints.
 - Project is initialized as a **git** repo with a first commit and `.gitignore`.
+  - **Critical**: Use `/binary-name` (not `binary-name`) in gitignore to avoid ignoring directories
+  - **Verify**: Ensure `cmd/` directory and all `main.go` files are tracked in git
+
+## 🚨 **Common CI Pitfalls to Avoid**
+
+- **golangci-lint v2**: Use `version: "2"` config format with separate `linters:` and `formatters:` sections
+- **GitHub Actions**: Use `golangci-lint-action@v7` for golangci-lint v2 support (not v6)
+- **Go Version**: Match Go version in `go.mod`, `.golangci.yml`, and GitHub Actions workflow
+- **Gitignore**: Use `/binary-name` not `binary-name` to avoid ignoring directories with same name
+- **Error Handling**: Functions returning errors must be handled in tests (avoid assignment mismatch)
+- **Formatting**: Always run `make lint` after code changes to catch gofmt issues
 
 ---
 
