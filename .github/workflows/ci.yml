@@ -107,8 +107,9 @@ jobs:
     
     - name: Build Docker image
       run: |
+        VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "dev")
         make docker-build
-        docker tag greetd:$(git describe --tags --always --dirty 2>/dev/null || echo "dev") greetd:dev
+        docker tag greetd:$VERSION greetd:dev
     
     - name: Test Docker image
       run: |
