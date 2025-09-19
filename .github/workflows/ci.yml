@@ -113,5 +113,5 @@ jobs:
     
     - name: Test Docker image
       run: |
-        docker run --rm greetd:dev version
-        docker run --rm greetd:dev health
+        docker run --rm greetd:dev ./greetd version
+        docker run --rm greetd:dev ./greetd health
