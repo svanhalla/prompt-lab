@@ -6,7 +6,7 @@ import (
 
 func TestSetup(t *testing.T) {
 	tmpDir := t.TempDir()
-	
+
 	tests := []struct {
 		name     string
 		level    string
@@ -36,7 +36,7 @@ func TestSetup(t *testing.T) {
 
 func TestSetupInvalidLevel(t *testing.T) {
 	tmpDir := t.TempDir()
-	
+
 	logger, err := Setup("invalid", "text", tmpDir)
 	if err == nil {
 		t.Error("Setup should fail with invalid level")
