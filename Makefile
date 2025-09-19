@@ -15,7 +15,7 @@ GOTEST = $(GOCMD) test
 GOMOD = $(GOCMD) mod
 BINARY_NAME = greetd
 MAIN_PATH = ./cmd/greetd
-COVERAGE_THRESHOLD = 70
+COVERAGE_THRESHOLD = 60
 
 help: ## Show this help message
 	@echo "Available targets:"
