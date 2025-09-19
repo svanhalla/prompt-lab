@@ -39,8 +39,14 @@ The project must be **well-structured**, **git-versioned**, documented, and read
   - **No Inline HTML**: Avoid inline HTML strings in Go code; use proper template files for maintainability
 - **Styling**: **Tailwind CSS** (set up a minimal build pipeline).
 - **Logging**: **logrus** (JSON formatter in production; human-readable in dev).
-- **Linting**: **golangci-lint** with a sensible, strict config that still allows velocity.
+- **Linting**: **golangci-lint v2** with a sensible, strict config that still allows velocity.
+  - **Config Format**: Use `version: "2"` in `.golangci.yml` (required for v2 compatibility)
+  - **Linters vs Formatters**: Separate `linters:` and `formatters:` sections (v2 breaking change)
+  - **Go Version**: Specify Go version in `run.go` field to match go.mod version
+  - **Essential Setup**: Enable govet, ineffassign, misspell, unused, staticcheck linters; gofmt, goimports formatters
 - **Tests**: Unit tests with table-driven style; include coverage targets.
+  - **Error Handling**: Functions returning errors must be properly handled in tests (avoid "assignment mismatch" compilation errors)
+  - **Test Isolation**: Use temporary directories and ephemeral ports for test isolation
 - **OpenAPI**: Provide a complete **OpenAPI 3.1** spec for the API.
 
 ### CLI Design
@@ -160,7 +166,7 @@ Propose and implement a clean structure, for example:
 - **GitHub Actions**:
   - `ci.yml` with steps: setup Go 1.25, cache, lint, test (with coverage), build.
   - Optional: Tailwind build step that runs on pushes (keep deterministic).
-- **golangci-lint**: enable common linters (staticcheck, revive, gofumpt, govet, errcheck, gocyclo with reasonable thresholds, mnd tuned to allow HTTP codes). Ensure `make lint` passes on the generated code.
+- **golangci-lint v2**: enable common linters (staticcheck, govet, ineffassign, misspell, unused) and formatters (gofmt, goimports). Use `version: "2"` config format with separate `linters:` and `formatters:` sections. Ensure `make lint` passes on the generated code.
 - **Portability**: Ensure Makefile works on systems without external dependencies like `bc` command. Use portable shell commands (awk, sed) for coverage calculations.
 
 ### Security & Quality
@@ -276,7 +282,7 @@ Before final delivery, **verify end-to-end** that the application builds, runs, 
   - `GET /swagger/` shows Swagger UI with API documentation.
   - `GET /docs` shows Redoc documentation.
   - **404 responses**: Browser requests to non-existent paths show helpful HTML page with links to valid endpoints.
-- `golangci-lint` passes via `make lint`.
+- `golangci-lint v2` passes via `make lint` with proper config format.
 - Unit tests pass with `make test` and coverage report is generated.
 - OpenAPI 3.1 spec exists at `api/openapi.yaml` and matches implemented endpoints.
 - Project is initialized as a **git** repo with a first commit and `.gitignore`.
